@@ -17,10 +17,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tiendat77.git"
+    "url": "git+https://github.com/tiendat77/love-alarm-ble.git"
   },
   "bugs": {
-    "url": "https://github.com/tiendat77/issues"
+    "url": "https://github.com/tiendat77/love-alarm-ble/issues"
   },
   "keywords": [
     "capacitor",
