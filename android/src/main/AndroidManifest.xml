@@ -1,3 +1,28 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.dathuynh.plugins.love_alarm_ble">
+    <!-- Bluetooth -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        tools:targetApi="s" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_CONNECT"
+        tools:targetApi="s" />cd
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="false" />
+
+
+    <application>
+        <service android:name=".ble.BleGattClientService" android:enabled="true"/>
+        <service android:name=".ble.BleGattServerService" android:enabled="true"/>
+    </application>
 </manifest>
