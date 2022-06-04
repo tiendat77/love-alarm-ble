@@ -1,19 +1,30 @@
 import type { PluginListenerHandle } from '@capacitor/core';
-import type { InitOptions, ReadOptions, ReadResult, ScanResult } from './definitions';
 import { LoveAlarmBle } from './plugin';
+import type {
+  BluetoothStatus,
+  InitOptions,
+  MatchingOptions,
+  ReadOptions,
+  ReadResult,
+  ScanResult
+} from './definitions';
 
 export interface LoveAlarmBleInterface {
   initialize(options: InitOptions): Promise<void>;
-  advertise(): Promise<void>;
+  isEnable(): Promise<BluetoothStatus>;
+  enable(): Promise<void>;
+  startAdvertise(): Promise<void>;
   stopAdvertise(): Promise<void>;
-  scan(callback: (result: ScanResult) => void): Promise<void>;
+  startScan(callback: (result: ScanResult) => void): Promise<void>;
   stopScan(): Promise<void>;
   read(options: ReadOptions): Promise<ReadResult>;
+  matches(options: MatchingOptions): Promise<void>;
 }
 
 class LoveAlarmBleClass implements LoveAlarmBleInterface {
 
   private scanListener: PluginListenerHandle | null = null;
+  private watchListener: PluginListenerHandle | null = null;
 
   /**
    * Initialize Bluetooth Low Energy (BLE). If it fails, BLE might be unavailable on this device.
@@ -24,10 +35,24 @@ class LoveAlarmBleClass implements LoveAlarmBleInterface {
   }
 
   /**
+   * Is Bluetooth is on in device
+  */
+  async isEnable(): Promise<BluetoothStatus> {
+    return await LoveAlarmBle.isEnable();
+  }
+
+  /**
+   * Enable Bluetooth
+  */
+  async enable(): Promise<void> {
+    return await LoveAlarmBle.enable();
+  }
+
+  /**
    * Scan for nearby BLE devices.The callback will be invoked on each device that is found.
    * @param callback
    */
-  async scan(callback: (result: ScanResult) => void) {
+  async startScan(callback: (result: ScanResult) => void) {
     await this.scanListener?.remove();
 
     this.scanListener = await LoveAlarmBle.addListener(
@@ -37,7 +62,7 @@ class LoveAlarmBleClass implements LoveAlarmBleInterface {
       }
     );
 
-    await LoveAlarmBle.scan(callback);
+    await LoveAlarmBle.startScan(callback);
   }
 
   /**
@@ -59,8 +84,8 @@ class LoveAlarmBleClass implements LoveAlarmBleInterface {
   /**
    * Advertising Profile ID to nearby BLE devices.
    */
-  async advertise(): Promise<void> {
-    await LoveAlarmBle.advertise();
+  async startAdvertise(): Promise<void> {
+    await LoveAlarmBle.startAdvertise();
   }
 
   /**
@@ -68,6 +93,25 @@ class LoveAlarmBleClass implements LoveAlarmBleInterface {
    */
   async stopAdvertise(): Promise<void> {
     await LoveAlarmBle.stopAdvertise();
+  }
+
+  async matches(options: MatchingOptions): Promise<void> {
+    await LoveAlarmBle.matches(options);
+  }
+
+  /**
+   * Watch for Gatt Service changes.
+   * Changes will be emitted if nearby device "ring".
+   */
+  async watch(callback: (result: any) => void) {
+    await this.watchListener?.remove();
+
+    this.watchListener = await LoveAlarmBle.addListener(
+      'onWatchResult',
+      (result: any) => {
+        callback(result);
+      }
+    );
   }
 
 }

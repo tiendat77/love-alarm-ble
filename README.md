@@ -14,11 +14,14 @@ npx cap sync
 <docgen-index>
 
 * [`initialize(...)`](#initialize)
-* [`advertise()`](#advertise)
+* [`isEnable()`](#isenable)
+* [`enable()`](#enable)
+* [`startAdvertise()`](#startadvertise)
 * [`stopAdvertise()`](#stopadvertise)
-* [`scan(...)`](#scan)
+* [`startScan(...)`](#startscan)
 * [`stopScan()`](#stopscan)
 * [`read(...)`](#read)
+* [`matches(...)`](#matches)
 * [`addListener(string, ...)`](#addlistenerstring)
 * [`addListener('onScanResult', ...)`](#addlisteneronscanresult)
 * [Interfaces](#interfaces)
@@ -41,10 +44,30 @@ initialize(options: InitOptions) => Promise<void>
 --------------------
 
 
-### advertise()
+### isEnable()
 
 ```typescript
-advertise() => Promise<void>
+isEnable() => Promise<BluetoothStatus>
+```
+
+**Returns:** <code>Promise&lt;<a href="#bluetoothstatus">BluetoothStatus</a>&gt;</code>
+
+--------------------
+
+
+### enable()
+
+```typescript
+enable() => Promise<void>
+```
+
+--------------------
+
+
+### startAdvertise()
+
+```typescript
+startAdvertise() => Promise<void>
 ```
 
 --------------------
@@ -59,10 +82,10 @@ stopAdvertise() => Promise<void>
 --------------------
 
 
-### scan(...)
+### startScan(...)
 
 ```typescript
-scan(callback: (result: ScanResult) => void) => Promise<void>
+startScan(callback: (result: ScanResult) => void) => Promise<void>
 ```
 
 | Param          | Type                                                                   |
@@ -92,6 +115,19 @@ read(options: ReadOptions) => Promise<ReadResult>
 | **`options`** | <code><a href="#readoptions">ReadOptions</a></code> |
 
 **Returns:** <code>Promise&lt;<a href="#readresult">ReadResult</a>&gt;</code>
+
+--------------------
+
+
+### matches(...)
+
+```typescript
+matches(options: MatchingOptions) => Promise<void>
+```
+
+| Param         | Type                                                        |
+| ------------- | ----------------------------------------------------------- |
+| **`options`** | <code><a href="#matchingoptions">MatchingOptions</a></code> |
 
 --------------------
 
@@ -138,6 +174,13 @@ addListener(eventName: 'onScanResult', listenerFunc: (result: any) => void) => P
 | **`advertising`** | <code>string</code> |
 
 
+#### BluetoothStatus
+
+| Prop         | Type                 |
+| ------------ | -------------------- |
+| **`enable`** | <code>boolean</code> |
+
+
 #### ScanResult
 
 | Prop          | Type                |
@@ -160,6 +203,13 @@ addListener(eventName: 'onScanResult', listenerFunc: (result: any) => void) => P
 | Prop          | Type                |
 | ------------- | ------------------- |
 | **`address`** | <code>string</code> |
+
+
+#### MatchingOptions
+
+| Prop           | Type                  |
+| -------------- | --------------------- |
+| **`profiles`** | <code>string[]</code> |
 
 
 #### PluginListenerHandle

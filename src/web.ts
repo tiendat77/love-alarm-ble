@@ -1,31 +1,35 @@
 import { WebPlugin } from '@capacitor/core';
 
 import type {
-  InitOptions,
   ReadOptions,
   LoveAlarmBlePlugin,
-  ReadResult
+  ReadResult,
+  BluetoothStatus
 } from './definitions';
 
 export class LoveAlarmBleWeb extends WebPlugin implements LoveAlarmBlePlugin {
 
-  async initialize(options: InitOptions): Promise<void> {
-    console.log('INITIALIZE: ' + options.advertising);
+  async initialize(): Promise<void> {
     return Promise.resolve();
   }
 
-  async scan(): Promise<void> {
-    console.log('SCAN');
+  async isEnable(): Promise<BluetoothStatus> {
+    return Promise.resolve({enable: false});
+  }
+
+  async enable(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  async startScan(): Promise<void> {
     return Promise.resolve();
   }
 
   async stopScan(): Promise<void> {
-    console.log('STOP SCAN');
     return Promise.resolve();
   }
 
   async read(options: ReadOptions): Promise<ReadResult> {
-    console.log(`READ ${options.address}`);
     return Promise.resolve({
       address: options.address,
       name: '',
@@ -33,13 +37,15 @@ export class LoveAlarmBleWeb extends WebPlugin implements LoveAlarmBlePlugin {
     });
   }
 
-  async advertise(): Promise<void> {
-    console.log('ADVERTISE');
+  async startAdvertise(): Promise<void> {
     return Promise.resolve();
   }
 
   async stopAdvertise(): Promise<void> {
-    console.log('STOP ADVERTISE');
+    return Promise.resolve();
+  }
+
+  async matches(): Promise<void> {
     return Promise.resolve();
   }
 
