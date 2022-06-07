@@ -11,7 +11,6 @@ import android.os.Handler;
 import android.os.ParcelUuid;
 import android.util.Log;
 
-import com.dathuynh.plugins.love_alarm_ble.Profile;
 import com.dathuynh.plugins.love_alarm_ble.callback.BleScanCallback;
 
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ public class BleScanner {
 
     private BleScanCallback saveBleScanCallback;
     private final BluetoothLeScanner bluetoothLeScanner;
-    private final ArrayList<BluetoothDevice> devices = new ArrayList();
+    private final ArrayList<BluetoothDevice> devices = new ArrayList<>();
 
     public boolean isScanning = false;
 
@@ -55,7 +54,7 @@ public class BleScanner {
 
         List<ScanFilter> filters = new ArrayList<>();
         filters.add(new ScanFilter.Builder().setServiceUuid(
-                ParcelUuid.fromString(Profile.PROFILE_SERVICE.toString())
+                ParcelUuid.fromString(BleProfile.PROFILE_SERVICE.toString())
         ).build());
 
         ScanSettings settings = new ScanSettings.Builder()
@@ -65,12 +64,7 @@ public class BleScanner {
         bluetoothLeScanner.startScan(filters, settings, scanCallback);
 
         // Stop scan after a pre-defined scan period.
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                stop();
-            }
-        }, SCAN_PERIOD);
+        new Handler().postDelayed(this::stop, SCAN_PERIOD);
     }
 
     public void stop() {
@@ -97,12 +91,6 @@ public class BleScanner {
             BluetoothDevice device = result.getDevice();
 
             if (!devices.contains(device)) {
-                Log.d(TAG, "Found device: " +
-                        result.getDevice().getAddress() +
-                        " | " +
-                        result.getDevice().getName()
-                );
-
                 devices.add(device);
                 saveBleScanCallback.onResult(result.getDevice());
             }

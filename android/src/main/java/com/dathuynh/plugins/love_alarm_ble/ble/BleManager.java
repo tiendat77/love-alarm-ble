@@ -1,141 +1,92 @@
 package com.dathuynh.plugins.love_alarm_ble.ble;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.os.IBinder;
-import android.util.Log;
 
+import com.dathuynh.plugins.love_alarm_ble.ble.ble_gatt_client.BleGattClientService;
+import com.dathuynh.plugins.love_alarm_ble.ble.ble_gatt_server.BleGattServerService;
 import com.dathuynh.plugins.love_alarm_ble.callback.BleReadCallback;
 import com.dathuynh.plugins.love_alarm_ble.callback.BleScanCallback;
-
-import java.util.ArrayList;
+import com.dathuynh.plugins.love_alarm_ble.callback.BleWatchCallback;
 
 public class BleManager {
 
-    private static final String TAG = "BluetoothLE Manager";
-
     private final Context context;
-    private BluetoothManager bluetoothManager;
-    private BluetoothAdapter bluetoothAdapter;
-    private BleScanner bluetoothScanner;
-    private BleGattClientService bleGattClientService;
-    private BleGattServerService bleGattServerService;
 
-    private String advertiseValue;
-
-    public boolean isInitialized = false;
+    private BleScanner scanner;
+    private BleGattClientService client;
+    private BleGattServerService server;
 
     public BleManager(Context context) {
         this.context = context;
-        this.initialize();
-    }
-
-    public BleManager(Context context, String advertiseValue) {
-        this.context = context;
-        this.advertiseValue = advertiseValue;
-        this.initialize();
-    }
-
-    private boolean initialize() {
-        boolean hardwareSupportsBLE = context
-                .getPackageManager()
-                .hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
-
-        if (!hardwareSupportsBLE) {
-            Log.e(TAG, "BLE is not available.");
-            return false;
-        }
 
         try {
-            if (bluetoothManager == null) {
-                bluetoothManager = (BluetoothManager) context
-                        .getSystemService(Context.BLUETOOTH_SERVICE);
-
-                if (bluetoothManager == null) {
-                    Log.e(TAG, "Unable to initialize BluetoothManager.");
-                    return false;
-                }
-            }
-
-            bluetoothAdapter = bluetoothManager.getAdapter();
-            if (bluetoothAdapter == null) {
-                Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
-                return false;
-            }
-
-            bluetoothScanner = new BleScanner(bluetoothAdapter);
-            isInitialized = true;
+            Bluetooth.getInstance().initialize(context);
+            scanner = new BleScanner(Bluetooth.getInstance().getAdapter());
 
             injectGattClientService();
             injectGattServerService();
-            return true;
 
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
     }
 
     public void enable() {
-        if (bluetoothAdapter == null) {
+        Bluetooth.getInstance().enable();
+    }
+
+    public void startScan(BleScanCallback callback) {
+        if (!Bluetooth.getInstance().isEnabled()) {
             return;
         }
 
-        if (!bluetoothAdapter.isEnabled()) {
-            bluetoothAdapter.enable();
-        }
-    }
-
-    public void scan(BleScanCallback callback) {
-        this.enable();
-
-        if (bluetoothScanner != null) {
-            bluetoothScanner.start(callback);
+        if (scanner != null) {
+            scanner.start(callback);
         }
     }
 
     public void stopScan() {
-        if (bluetoothScanner != null) {
-            bluetoothScanner.stop();
+        if (scanner != null) {
+            scanner.stop();
         }
     }
 
     public void read(String address, BleReadCallback callback) {
-        if (bleGattClientService == null) {
+        if (client == null) {
             callback.onError("BluetoothAdapter not initialized");
             return;
         }
 
-        bleGattClientService.read(address, callback);
+        client.read(address, callback);
     }
 
-    public void advertise() {
-        if (bleGattServerService == null) {
+    public void startAdvertise() {
+        if (server == null) {
             return;
         }
-        bleGattServerService.start();
+        server.start();
     }
 
     public void stopAdvertise() {
-        if (bleGattServerService == null) {
+        if (server == null) {
             return;
         }
-        bleGattServerService.stop();
+        server.stop();
     }
 
     public void destroy() {
         context.unbindService(gattClientServiceConnection);
         context.unbindService(gattServerServiceConnection);
-        bleGattClientService = null;
-        bleGattServerService = null;
+        client = null;
+        server = null;
+    }
+
+    public void watch(BleWatchCallback callback) {
+        server.watch(callback);
     }
 
     private void injectGattClientService() {
@@ -150,15 +101,13 @@ public class BleManager {
     private final ServiceConnection gattClientServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            bleGattClientService = ((BleGattClientService.LocalBinder) service).getService();
-            if (!bleGattClientService.initialize()) {
-                Log.e(TAG, "Unable to initialize Bluetooth");
-            }
+            client = ((BleGattClientService.LocalBinder) service).getService();
+            client.initialize();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            bleGattClientService = null;
+            client = null;
         }
     };
 
@@ -174,15 +123,13 @@ public class BleManager {
     private final ServiceConnection gattServerServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            bleGattServerService = ((BleGattServerService.LocalBinder) service).getService();
-            if (!bleGattServerService.initialize(advertiseValue)) {
-                Log.e(TAG, "Unable to initialize Bluetooth");
-            }
+            server = ((BleGattServerService.LocalBinder) service).getService();
+            server.initialize();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            bleGattServerService = null;
+            server = null;
         }
     };
 }

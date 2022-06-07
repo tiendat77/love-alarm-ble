@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class PermissionHelper {
 
     public static String[] getPermissionAliases() {
-        String[] aliases = new String[0];
+        String[] aliases;
 
         if (Build.VERSION.SDK_INT >= 31) {
             aliases = new String[] {
@@ -33,7 +33,7 @@ public class PermissionHelper {
             return true;
         }
 
-        Boolean allGranted = true;
+        boolean allGranted = true;
 
         for (Boolean permission : permissions) {
             if (!permission) {

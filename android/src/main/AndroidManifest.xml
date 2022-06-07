@@ -25,7 +25,7 @@
 
 
     <application>
-        <service android:name=".ble.BleGattClientService" android:enabled="true"/>
-        <service android:name=".ble.BleGattServerService" android:enabled="true"/>
+        <service android:name=".ble.ble_gatt_client.BleGattClientService" android:enabled="true"/>
+        <service android:name=".ble.ble_gatt_server.BleGattServerService" android:enabled="true"/>
     </application>
 </manifest>

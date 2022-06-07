@@ -6,7 +6,8 @@ import type {
   MatchingOptions,
   ReadOptions,
   ReadResult,
-  ScanResult
+  ScanResult,
+  WatchResult
 } from './definitions';
 
 export interface LoveAlarmBleInterface {
@@ -103,12 +104,12 @@ class LoveAlarmBleClass implements LoveAlarmBleInterface {
    * Watch for Gatt Service changes.
    * Changes will be emitted if nearby device "ring".
    */
-  async watch(callback: (result: any) => void) {
+  async watch(callback: (result: WatchResult) => void) {
     await this.watchListener?.remove();
 
     this.watchListener = await LoveAlarmBle.addListener(
       'onWatchResult',
-      (result: any) => {
+      (result: WatchResult) => {
         callback(result);
       }
     );

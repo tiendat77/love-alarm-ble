@@ -34,4 +34,19 @@ public class Conversion {
         return result;
     }
 
+    /*
+        export interface WatchResult {
+          type: 'ring' | 'un-ring';
+          address?: string;
+          profile?: string;
+        }
+    * */
+    public static JSObject getWatchResult(String type, String address, String profile) {
+        JSObject result = new JSObject();
+        result.put("type", type);
+        result.put("address", address);
+        result.put("profile", profile);
+        return result;
+    }
+
 }

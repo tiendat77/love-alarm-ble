@@ -37,6 +37,12 @@ export interface ReadResult {
   profile?: string;
 }
 
+export interface WatchResult {
+  type: 'ring' | 'un-ring';
+  address?: string;
+  profile?: string;
+}
+
 export interface BluetoothStatus {
   enable: boolean;
 }
